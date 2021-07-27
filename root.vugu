@@ -1,0 +1,55 @@
+<div>
+    <main role="main" class="container text-center">
+
+        <div class="mt-5">
+            <h1>Welcome to Vugu TODO APP</h1>
+            You have <span vg-content="len(c.Items) - c.DoneItems"></span> open and <span vg-content="c.DoneItems"></span> closed items in your todo list
+            <vgform:Input type="text" :Value='vgform.StringPtr{&c.CurrentTodo}'></vgform:Input>
+
+            <button @click="c.HandleAdd(event)">ADD</button>
+
+
+            <div>
+               <span vg-for='i, value := range c.Items'>
+                  <div style="text-decoration: line-through;" vg-if="value.Done">
+                    <div><span vg-content="value.Id"></span>.<span vg-content="value.Body"></span></div>
+                  </div>
+                  <div vg-if="!value.Done">
+                    <div><span vg-content="value.Id"></span>.<span vg-content="value.Body"></span><button @click=c.HandleDone(i)>Done</button></div>
+                  </div>
+               </div>
+           </div>
+
+        </div>
+
+    </main>
+</div>
+
+<script type="application/x-go">
+
+import "github.com/vugu/vugu/vgform"
+
+type Item struct {
+    Id int `vugu:"data"`
+    Body string `vugu:"data"`
+    Done bool `vugu:"data"`
+}
+
+type Root struct {
+    Items []Item `vugu:"data"`
+    DoneItems int `vugu: "data"`
+    CurrentTodo string `vugu:"data"`
+}
+func (c *Root) HandleAdd(event vugu.DOMEvent) {
+    c.Items = append(c.Items, Item{
+        Id: len(c.Items) + 1,
+        Body: c.CurrentTodo,
+    })
+    c.CurrentTodo = ""
+}
+
+func (c *Root) HandleDone(i int) {
+    c.Items[i].Done = true
+    c.DoneItems += 1
+}
+</script>
